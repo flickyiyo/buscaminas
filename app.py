@@ -23,9 +23,9 @@ class MainFrame(tk.Frame):
 		casillas = []
 		botones = []
 		x = int(raw_input("X:"))
-		self.x = x
+		self.dim_x = x
 		y = int(raw_input("Y:"))
-		self.y =y
+		self.dim_y =y
 		minas = int(raw_input("Minas: "))
 		contador_minas = 0
 		for i in range(y):
@@ -33,17 +33,54 @@ class MainFrame(tk.Frame):
 			botones.append([])
 			for j in range(x):
 				rnd = randint(0,100)
-				casilla_tmp = Casilla(rnd, juego = Juego())
+				casilla_tmp = Casilla(rnd, callback = self.game_over)
 				if rnd <=50 and contador_minas<minas:
 					casilla_tmp.mina=True
 					contador_minas=contador_minas+1
 				casillas[i].append(casilla_tmp)
-				button = tk.Button(self.frame, text="a", command=casillas[i][j].click_izq)
+				button = tk.Button(self.frame, text="C")#, command=casillas[i][j].click_izq)
+				button.bind('<Button-1>', casillas[i][j].click_izq) 
+				button.bind('<Button-3>', casillas[i][j].click_der)  
 				casillas[i][j].button = button
+				casillas[i][j].button.bind
 				button.grid(row=j, column=i)
 				botones[i].append(button)
 		self.botones = botones
 		self.casillas = casillas
+		self.set_numeros()
+
+	def set_numeros(self):
+		minas = []
+		for i in range(self.dim_y):
+			for j in range(self.dim_x):
+				if self.casillas[i][j].mina:
+					minas.append([i,j])
+		for i in range(self.dim_y):
+			for j in range(self.dim_x):
+				contador = 0
+				print ("["+ str(i) + "],["+str(j)+"]")
+				if [i-1,j] in minas:
+					contador +=1
+				if [i+1,j] in minas:
+					contador+=1
+				if [i,j-1] in minas:
+					contador +=1
+				if [i,j+1] in minas:
+					contador +=1
+				if [i-1,j-1] in minas:
+					contador +=1
+				if [i+1,j-1] in minas:
+					contador +=1
+				if [i-1,j+1] in minas:
+					contador +=1
+				if [i+1,j+1] in minas:
+					contador +=1
+				print contador
+				self.casillas[i][j].set_numero_minas(contador)
+	def game_over(self):
+		for i in range(self.dim_y):
+			for j in range(self.dim_x):
+				self.casillas[i][j].abrir_casilla()
 	
 	def asignar_numeros(self):
 		for i in range(self.y):
@@ -61,6 +98,7 @@ class MainFrame(tk.Frame):
 
 if __name__ == '__main__':
 	root = tk.Tk()
+	root.bind('<Button-1>')
 	app = MainFrame(root)
 	root.mainloop()
 
